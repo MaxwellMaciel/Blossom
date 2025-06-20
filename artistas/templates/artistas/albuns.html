@@ -1,0 +1,235 @@
+{% extends 'artistas/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .albuns-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .album {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        aspect-ratio: 1;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .album:hover {
+        transform: scale(1.05);
+    }
+
+    .album img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .album-info {
+        padding: 1rem;
+        color: white;
+        text-align: center;
+    }
+
+    .album-info h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .album-info p {
+        margin: 0.5rem 0 0;
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .back-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Estilos para o flip card */
+    .flip-card {
+        perspective: 1000px;
+        aspect-ratio: 1;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .flip-card:hover .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .flip-card-front img, .flip-card-back img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .flip-card-back {
+        transform: rotateY(180deg);
+    }
+
+    .album.flip-card {
+        background: none;
+    }
+
+    .album.flip-card .album-info {
+        margin-top: 1rem;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1rem;
+        border-radius: 0 0 10px 10px;
+    }
+
+    /* Ajuste específico para a imagem URIAS_COSTA */
+    .flip-card-back img[src*="URIAS_COSTA"] {
+        object-position: center top;
+    }
+</style>
+
+<div id="spa-content">
+    <a href="{% url 'home' %}" class="back-button">← Voltar</a>
+    <div class="albuns-container">
+        <div class="album flip-card" id="urias-album">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="{% static 'artistas/images/URIAS_FRENTE.jpeg' %}" alt="Urias">
+                </div>
+                <div class="flip-card-back">
+                    <img src="{% static 'artistas/images/URIAS_COSTA.jpeg' %}" alt="Urias">
+                </div>
+            </div>
+        </div>
+        <div class="album flip-card" id="furia-album">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="{% static 'artistas/images/FURIA_FRENTE.jpg' %}" alt="Fúria">
+                </div>
+                <div class="flip-card-back">
+                    <img src="{% static 'artistas/images/FURIA_COSTAS.jpg' %}" alt="Fúria">
+                </div>
+            </div>
+        </div>
+        <div class="album flip-card" id="hermind-album">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="{% static 'artistas/images/HERMIND_FRENTE.jpg' %}" alt="Hermind">
+                </div>
+                <div class="flip-card-back">
+                    <img src="{% static 'artistas/images/HERMIND_COSTAS.jpg' %}" alt="Hermind">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<audio id="urias-audio" src="{% static 'artistas/audio/URIAS_AUDIO.mp3' %}" preload="auto" volume="0.5"></audio>
+<audio id="hermind-audio" src="{% static 'artistas/audio/hermind_audio.mp3' %}" preload="auto" volume="0.5"></audio>
+<audio id="furia-audio" src="{% static 'artistas/audio/FURIA_AUDIO.mp3' %}" preload="auto" volume="0.5"></audio>
+
+<script>
+    // Funções para controlar o áudio do URIAS
+    function playUriasAudio() {
+        const audio = document.getElementById('urias-audio');
+        audio.volume = 0.5;
+        audio.play();
+    }
+
+    function pauseUriasAudio() {
+        const audio = document.getElementById('urias-audio');
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    // Funções para Fúria e Hermind
+    function playFuriaAudio() {
+        const audio = document.getElementById('furia-audio');
+        audio.volume = 0.5;
+        audio.play();
+    }
+
+    function pauseFuriaAudio() {
+        const audio = document.getElementById('furia-audio');
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    function playHermindAudio() {
+        const audio = document.getElementById('hermind-audio');
+        audio.volume = 0.5;
+        audio.play();
+    }
+
+    function pauseHermindAudio() {
+        const audio = document.getElementById('hermind-audio');
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    // Adiciona os eventos de hover e clique
+    document.addEventListener('DOMContentLoaded', function() {
+        const uriasAlbum = document.getElementById('urias-album');
+        const furiaAlbum = document.getElementById('furia-album');
+        const hermindAlbum = document.getElementById('hermind-album');
+        
+        uriasAlbum.addEventListener('mouseenter', playUriasAudio);
+        uriasAlbum.addEventListener('mouseleave', pauseUriasAudio);
+        uriasAlbum.addEventListener('click', function() {
+            window.location.href = '/albuns/urias/';
+        });
+
+        furiaAlbum.addEventListener('mouseenter', playFuriaAudio);
+        furiaAlbum.addEventListener('mouseleave', pauseFuriaAudio);
+        furiaAlbum.addEventListener('click', function() {
+            window.location.href = '/albuns/furia/';
+        });
+
+        hermindAlbum.addEventListener('mouseenter', playHermindAudio);
+        hermindAlbum.addEventListener('mouseleave', pauseHermindAudio);
+        hermindAlbum.addEventListener('click', function() {
+            window.location.href = '/albuns/hermind/';
+        });
+    });
+</script>
+{% endblock %} 

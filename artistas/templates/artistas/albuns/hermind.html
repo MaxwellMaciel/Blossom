@@ -1,0 +1,240 @@
+{% extends 'artistas/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .album-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .album-header {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    .album-cover {
+        width: 300px;
+        height: 300px;
+        border-radius: 10px;
+        overflow: hidden;
+        perspective: 1000px;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 2s;
+        transform-style: preserve-3d;
+        animation: flip 4s infinite;
+    }
+
+    @keyframes flip {
+        0% {
+            transform: rotateY(0deg);
+        }
+        50% {
+            transform: rotateY(180deg);
+        }
+        100% {
+            transform: rotateY(360deg);
+        }
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+
+    .flip-card-front img, .flip-card-back img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .flip-card-back {
+        transform: rotateY(180deg);
+    }
+
+    .album-info {
+        flex: 1;
+        color: white;
+    }
+
+    .album-info h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #C71585;
+    }
+
+    .album-info p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        color: #8B4A6B;
+    }
+
+    .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(199, 21, 133, 0.2);
+        color: #C71585;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        z-index: 10;
+    }
+
+    .back-button:hover {
+        background: rgba(199, 21, 133, 0.3);
+    }
+
+    .track-list {
+        width: 100%;
+        margin-top: 2rem;
+    }
+
+    .track-list h2 {
+        color: #C71585;
+        margin-bottom: 1rem;
+    }
+
+    .track {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(199, 21, 133, 0.1);
+        margin-bottom: 0.5rem;
+        border-radius: 5px;
+        color: #8B4A6B;
+        border: 1px solid rgba(199, 21, 133, 0.2);
+    }
+
+    .track-number {
+        width: 30px;
+        color: #C71585;
+    }
+
+    .track-title {
+        flex: 1;
+    }
+
+    .track-duration {
+        color: #8B4A6B;
+    }
+
+    @media (max-width: 768px) {
+        .album-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .album-cover {
+            width: 250px;
+            height: 250px;
+        }
+    }
+
+    .track-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        background: rgba(199,21,133,0.07);
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 1rem;
+        color: #8B4A6B;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .track-table th, .track-table td {
+        padding: 0.7rem 0.5rem;
+        border-bottom: 1px solid rgba(199,21,133,0.12);
+        text-align: left;
+    }
+    .track-table th {
+        background: rgba(199,21,133,0.13);
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #C71585;
+    }
+    .track-table tr:last-child td {
+        border-bottom: none;
+    }
+    .track-table tbody tr:hover {
+        background: rgba(199,21,133,0.13);
+        transition: background 0.2s;
+    }
+    @media (max-width: 700px) {
+        .track-table th, .track-table td {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.3rem;
+        }
+    }
+</style>
+
+<a href="{% url 'albuns' %}" class="back-button">← Voltar</a>
+
+<div class="album-container">
+    <div class="album-header">
+        <div class="album-cover">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="{% static 'artistas/images/HERMIND_FRENTE.jpg' %}" alt="Hermind">
+                </div>
+                <div class="flip-card-back">
+                    <img src="{% static 'artistas/images/HERMIND_COSTAS.jpg' %}" alt="Hermind">
+                </div>
+            </div>
+        </div>
+        <div class="album-info">
+            <h1>Hermind</h1>
+            <p>O terceiro álbum de Urias, "Hermind", lançado em 2022, representa uma evolução ainda mais profunda em sua carreira. Com uma sonoridade mais experimental e letras mais introspectivas, o álbum explora temas de identidade, transformação e autodescoberta.</p>
+            <p>O álbum apresenta uma fusão única de pop, R&B e música eletrônica, consolidando Urias como uma das artistas mais inovadoras da música brasileira contemporânea.</p>
+        </div>
+    </div>
+
+    <div class="track-list">
+        <h2>Faixas</h2>
+        <div style="overflow-x:auto;">
+        <table class="track-table">
+            <thead>
+                <tr>
+                    <th>N.º</th>
+                    <th>Título</th>
+                    <th>Compositor(es)</th>
+                    <th>Produtor(es)</th>
+                    <th>Duração</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Crack The Code</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>1:17</td></tr>
+                <tr><td>2</td><td>Ultimate One</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>2:10</td></tr>
+                <tr><td>3</td><td>R.I.P</td><td>Urias, Number Teddie, Maffalda, Gorky, Zebu</td><td>Brabo</td><td>2:09</td></tr>
+                <tr><td>4</td><td>Danger</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>2:15</td></tr>
+                <tr><td>5</td><td>The Way I Drop</td><td>Urias, Number Teddie, Maffalda, Gorky, Zebu</td><td>Brabo</td><td>2:42</td></tr>
+                <tr><td>6</td><td>Major</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>2:19</td></tr>
+                <tr><td>7</td><td>So Dumb</td><td>Urias, Davi Sabbag, Gorky, Number Teddie, Maffalda, Zebu</td><td>Maffalda</td><td>3:04</td></tr>
+                <tr><td>8</td><td>Blossom</td><td>Urias, Alice Caymmi, Number Teddie, Maffalda</td><td>Brabo</td><td>2:19</td></tr>
+                <tr><td>9</td><td>Magnata</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>1:45</td></tr>
+                <tr><td>10</td><td>Neo Thang</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>2:31</td></tr>
+                <tr><td>11</td><td>Cuntelectual</td><td>Urias, Davi Sabbag, Gorky, Number Teddie, Maffalda, Zebu</td><td>Maffalda</td><td>2:11</td></tr>
+                <tr><td>12</td><td>Je Ne Sais Quoi</td><td>Urias, Gorky, Number Teddie, Maffalda, Zebu</td><td>Brabo</td><td>2:18</td></tr>
+                <tr><td>13</td><td>Her Mind</td><td>Urias, Number Teddie, Maffalda</td><td>Maffalda</td><td>2:14</td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

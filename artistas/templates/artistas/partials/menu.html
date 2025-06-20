@@ -1,0 +1,137 @@
+{% load static %}
+
+<!-- Botão do Menu -->
+<button class="menu-toggle" id="menuToggle" aria-label="Abrir menu de navegação">
+    Menu
+</button>
+
+<!-- Overlay do Menu -->
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Container do Menu -->
+<div class="menu-container" id="menuContainer">
+    <!-- Cabeçalho do Menu -->
+    <div class="menu-header">
+        <h2 class="menu-title">Navegação</h2>
+    </div>
+    
+    <!-- Navegação do Menu -->
+    <nav class="menu-nav">
+        <a href="{% url 'home' %}" class="menu-item" data-page="home">
+            <span class="menu-item-icon">🏠</span>
+            Início
+        </a>
+        <a href="{% url 'visao' %}" class="menu-item" data-page="visao">
+            <span class="menu-item-icon">👁️</span>
+            Visão
+        </a>
+        <a href="{% url 'carreira' %}" class="menu-item" data-page="carreira">
+            <span class="menu-item-icon">🎯</span>
+            Carreira
+        </a>
+        <a href="{% url 'albuns' %}" class="menu-item" data-page="albuns">
+            <span class="menu-item-icon">💿</span>
+            Álbuns
+        </a>
+        <a href="{% url 'galeria' %}" class="menu-item" data-page="galeria">
+            <span class="menu-item-icon">🖼️</span>
+            Galeria
+        </a>
+    </nav>
+    
+    <!-- Rodapé do Menu -->
+    <div class="menu-footer">
+        <div class="menu-version">Galeria++ v1.0</div>
+    </div>
+</div>
+
+<!-- CSS do Menu -->
+<link rel="stylesheet" href="{% static 'visao/css/menu.css' %}">
+
+<!-- JavaScript do Menu -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuContainer = document.getElementById('menuContainer');
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // Função para abrir o menu
+    function openMenu() {
+        menuToggle.classList.add('active');
+        menuOverlay.classList.add('active');
+        menuContainer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Animar itens do menu
+        menuItems.forEach((item, index) => {
+            item.style.setProperty('--item-index', index);
+            setTimeout(() => {
+                item.classList.add('animated');
+            }, index * 100);
+        });
+    }
+    
+    // Função para fechar o menu
+    function closeMenu() {
+        menuToggle.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        menuContainer.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Remover animações
+        menuItems.forEach(item => {
+            item.classList.remove('animated');
+        });
+    }
+    
+    // Event listeners
+    menuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (menuContainer.classList.contains('active')) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    });
+    
+    menuOverlay.addEventListener('click', closeMenu);
+    
+    // Fechar menu ao clicar em um item
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            setTimeout(closeMenu, 300); // Pequeno delay para transição
+        });
+    });
+    
+    // Fechar menu com tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menuContainer.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+    
+    // Marcar página atual no menu
+    const currentPath = window.location.pathname;
+    menuItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href && currentPath.includes(href.split('/')[1])) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Detectar mudança de página para fechar menu
+    window.addEventListener('popstate', closeMenu);
+    
+    // Fechar menu ao redimensionar a tela (mobile)
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (window.innerWidth > 768 && menuContainer.classList.contains('active')) {
+                closeMenu();
+            }
+        }, 250);
+    });
+});
+</script> 

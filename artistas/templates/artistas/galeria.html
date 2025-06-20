@@ -1,0 +1,895 @@
+{% extends 'artistas/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    @font-face {
+        font-family: 'Canela';
+        src: url("{% static 'artistas/fonts/Canela-Regular.woff2' %}") format('woff2'),
+             url("{% static 'artistas/fonts/Canela-Regular.woff' %}") format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .galeria-container {
+        padding: 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .galeria-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #8B6B4A;
+        font-family: 'Canela', serif;
+    }
+
+    .galeria-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #8B6B4A, #5D4A3A);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .galeria-stats {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        color: #6B5B47;
+    }
+
+    .search-container {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 200px;
+        max-width: 400px;
+        padding: 0.8rem;
+        border: 1px solid #8B6B4A;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #6B5B47;
+        font-size: 1rem;
+        font-family: 'Canela', serif;
+    }
+
+    .search-input::placeholder {
+        color: rgba(107, 91, 71, 0.6);
+    }
+
+    .filter-select {
+        padding: 0.8rem;
+        border: 1px solid #8B6B4A;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #6B5B47;
+        font-size: 1rem;
+        min-width: 150px;
+        font-family: 'Canela', serif;
+    }
+
+    .filter-select option {
+        background: #000;
+        color: #6B5B47;
+    }
+
+    .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.8rem;
+        margin-top: 2rem;
+        padding: 0 1rem;
+    }
+
+    .galeria-item {
+        position: relative;
+        border-radius: 4px;
+        overflow: hidden;
+        aspect-ratio: 1;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(139, 115, 85, 0.1);
+        border: 1px solid rgba(139, 115, 85, 0.3);
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .galeria-item:nth-child(1) { animation-delay: 0.1s; }
+    .galeria-item:nth-child(2) { animation-delay: 0.2s; }
+    .galeria-item:nth-child(3) { animation-delay: 0.3s; }
+    .galeria-item:nth-child(4) { animation-delay: 0.4s; }
+    .galeria-item:nth-child(5) { animation-delay: 0.5s; }
+    .galeria-item:nth-child(6) { animation-delay: 0.6s; }
+    .galeria-item:nth-child(7) { animation-delay: 0.7s; }
+    .galeria-item:nth-child(8) { animation-delay: 0.8s; }
+    .galeria-item:nth-child(9) { animation-delay: 0.9s; }
+    .galeria-item:nth-child(10) { animation-delay: 1.0s; }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .galeria-item:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        border-color: rgba(139, 115, 85, 0.6);
+    }
+
+    .galeria-item img,
+    .galeria-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .galeria-item:hover img,
+    .galeria-item:hover video {
+        transform: scale(1.05);
+    }
+
+    .galeria-item-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.8rem;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+        color: #8B6B4A;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-family: 'Canela', serif;
+    }
+
+    .galeria-item:hover .galeria-item-info {
+        opacity: 1;
+    }
+
+    .galeria-item-info .file-info {
+        font-size: 0.9rem;
+        opacity: 0.95;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #6B5B47;
+    }
+
+    .file-type {
+        background: rgba(166, 123, 91, 0.8);
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+
+    .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(139, 107, 74, 0.2);
+        color: #8B6B4A;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        z-index: 10;
+        font-family: 'Canela', serif;
+        font-weight: normal;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background: rgba(139, 107, 74, 0.3);
+        transform: translateX(-5px);
+    }
+
+    .no-results {
+        text-align: center;
+        color: #8B6B4A;
+        padding: 3rem;
+        font-size: 1.2rem;
+        font-family: 'Canela', serif;
+        background: rgba(139, 115, 85, 0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(139, 115, 85, 0.3);
+    }
+
+    .no-results h3 {
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        color: #6B5B47;
+    }
+
+    .no-results p {
+        opacity: 0.9;
+        line-height: 1.6;
+        color: #8B6B4A;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+        z-index: 1000;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(0px);
+    }
+
+    .modal.active {
+        display: flex;
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90vh;
+        margin: auto;
+        position: relative;
+        transform: scale(0.8);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal.active .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .modal-content img,
+    .modal-content video {
+        max-width: 100%;
+        max-height: 90vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content video {
+        min-width: 50%;
+        min-height: 50%;
+        max-width: 95vw;
+        max-height: 85vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* Garante que os controles do vídeo sejam visíveis */
+    .modal-content video::-webkit-media-controls {
+        display: flex !important;
+    }
+
+    .modal-content video::-webkit-media-controls-panel {
+        display: flex !important;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #8B6B4A;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 1001;
+        background: rgba(0, 0, 0, 0.5);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+
+    .modal.active .modal-close {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+        transition-delay: 0.2s;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.1) rotate(0deg);
+    }
+
+    .modal-info {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1rem;
+        border-radius: 10px;
+        color: #8B6B4A;
+        font-family: 'Canela', serif;
+        z-index: 1002;
+        transform: translateY(50px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal.active .modal-info {
+        transform: translateY(0);
+        opacity: 1;
+        transition-delay: 0.3s;
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        font-weight: normal;
+        color: #6B5B47;
+    }
+
+    .modal-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        opacity: 0.9;
+        color: #8B6B4A;
+    }
+
+    .modal-size {
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-size.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .modal-download {
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
+        color: #8B6B4A;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 12px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-family: 'Canela', serif;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(139, 107, 74, 0.3);
+        font-weight: normal;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        z-index: 1002;
+        transform: translateY(50px) scale(0.8);
+        opacity: 0;
+    }
+
+    .modal.active .modal-download {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        transition-delay: 0.4s;
+    }
+
+    .modal-download:hover {
+        background: rgba(0, 0, 0, 0.9);
+        border-color: rgba(139, 107, 74, 0.6);
+        transform: translateY(-2px);
+    }
+
+    /* Classe para centralizar o botão de download (usada via JavaScript) */
+    .modal-download.centered {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(50px) scale(0.8);
+    }
+
+    .modal.active .modal-download.centered {
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    .modal-download.centered:hover {
+        transform: translateX(-50%) translateY(-2px) scale(1);
+    }
+
+    .modal-download i {
+        font-size: 1rem;
+    }
+
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .galeria-item:hover .video-overlay {
+        opacity: 1;
+    }
+
+    .play-button {
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+    }
+
+    .galeria-item:hover .play-button {
+        transform: scale(1.1);
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    /* Estilo para quando o vídeo está em tela cheia */
+    .modal-content video.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        max-height: none;
+        min-width: none;
+        min-height: none;
+        z-index: 1003;
+        border-radius: 0;
+    }
+
+    /* Indicador de vídeo mutado */
+    .video-muted-indicator {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #8B6B4A;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-family: 'Canela', serif;
+        z-index: 1004;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .video-muted-indicator.show {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .galeria-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .galeria-header h1 {
+            font-size: 2rem;
+        }
+
+        .search-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input {
+            max-width: none;
+        }
+    }
+</style>
+
+<a href="{% url 'home' %}" class="back-button">← Voltar</a>
+
+<div class="galeria-container">
+    <div class="galeria-header">
+        <h1>Galeria de Mídia</h1>
+        <div class="galeria-stats">
+            {% if total_imagens > 0 %}
+                {{ total_imagens }} arquivo{{ total_imagens|pluralize:"s" }} encontrado{{ total_imagens|pluralize:"s" }}
+            {% else %}
+                Nenhum arquivo na galeria
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar imagens..." id="searchInput">
+        <select class="filter-select" id="typeFilter">
+            <option value="">Todos os tipos</option>
+            <option value="image">Imagens</option>
+            <option value="video">Vídeos</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="gif">GIF</option>
+            <option value="webp">WebP</option>
+            <option value="mp4">MP4</option>
+            <option value="avi">AVI</option>
+            <option value="mov">MOV</option>
+            <option value="webm">WebM</option>
+        </select>
+    </div>
+
+    <div class="galeria-grid" id="galeriaGrid">
+        {% if imagens %}
+            {% for imagem in imagens %}
+            <div class="galeria-item" data-nome="{{ imagem.nome_sem_extensao|lower }}" data-tipo="{{ imagem.tipo|lower }}" data-midia="{{ imagem.tipo_midia }}">
+                {% if imagem.tipo_midia == 'video' %}
+                    <video src="{% static imagem.caminho %}" alt="{{ imagem.alt }}" preload="auto" autoplay loop muted playsinline style="pointer-events:none;">
+                        <source src="{% static imagem.caminho %}" type="video/mp4">
+                        <source src="{% static imagem.caminho %}" type="video/webm">
+                        <source src="{% static imagem.caminho %}" type="video/ogg">
+                        Seu navegador não suporta vídeos.
+                    </video>
+                    <div class="video-overlay">
+                        <div class="play-button">▶</div>
+                    </div>
+                {% else %}
+                    <img src="{% static imagem.caminho %}" alt="{{ imagem.alt }}">
+                {% endif %}
+                <div class="galeria-item-info">
+                    <div class="file-info">
+                        <span class="file-type">{{ imagem.tipo }}</span>
+                        <span>{{ imagem.tamanho }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <h3>Nenhuma imagem encontrada</h3>
+                <p>Adicione imagens na pasta <code>artistas/static/artistas/images/galeria/</code> para vê-las aqui.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="imageModal">
+    <div class="modal-close">&times;</div>
+    <div class="modal-content">
+        <img src="" alt="" style="display: none;">
+        <video src="" controls preload="metadata" autoplay muted style="display: none;">
+            <source src="" type="video/mp4">
+            <source src="" type="video/webm">
+            <source src="" type="video/ogg">
+            Seu navegador não suporta vídeos.
+        </video>
+        <div class="modal-info">
+            <div class="modal-title"></div>
+            <div class="modal-details">
+                <span class="modal-type"></span>
+                <span class="modal-size"></span>
+            </div>
+        </div>
+        <a class="modal-download" download>
+            <i class="fas fa-download"></i>
+            Download
+        </a>
+        <div class="video-muted-indicator" id="mutedIndicator">
+            🔇 Vídeo mutado - Clique para ativar som
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const galeriaGrid = document.getElementById('galeriaGrid');
+    const items = document.querySelectorAll('.galeria-item');
+    const modal = document.getElementById('imageModal');
+    const modalImg = modal.querySelector('img');
+    const modalVideo = modal.querySelector('video');
+    const modalTitle = modal.querySelector('.modal-title');
+    const modalType = modal.querySelector('.modal-type');
+    const modalSize = modal.querySelector('.modal-size');
+    const modalClose = modal.querySelector('.modal-close');
+    const modalDownload = modal.querySelector('.modal-download');
+    const modalContent = modal.querySelector('.modal-content');
+    const modalInfo = modal.querySelector('.modal-info');
+    const mutedIndicator = modal.querySelector('.video-muted-indicator');
+    let isVideoFullscreen = false;
+
+    function filterItems() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedType = typeFilter.value.toLowerCase();
+
+        items.forEach(item => {
+            const nome = item.dataset.nome;
+            const tipo = item.dataset.tipo;
+            const midia = item.dataset.midia;
+            const matchesSearch = nome.includes(searchTerm);
+            
+            // Verifica se corresponde ao filtro de tipo
+            let matchesType = true;
+            if (selectedType) {
+                if (selectedType === 'image' || selectedType === 'video') {
+                    matchesType = midia === selectedType;
+                } else {
+                    matchesType = tipo === selectedType;
+                }
+            }
+
+            item.style.display = matchesSearch && matchesType ? 'block' : 'none';
+        });
+
+        // Verifica se há resultados
+        const visibleItems = document.querySelectorAll('.galeria-item[style="display: block"]');
+        if (visibleItems.length === 0) {
+            if (!document.querySelector('.no-results')) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = '<h3>Nenhuma imagem encontrada</h3><p>Tente ajustar os filtros de busca.</p>';
+                galeriaGrid.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.querySelector('.no-results');
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+    }
+
+    // Função para abrir o modal
+    function openModal(src, type, size, isVideo) {
+        if (isVideo) {
+            modalImg.style.display = 'none';
+            modalVideo.style.display = 'block';
+            
+            // Configura as sources do vídeo
+            const sources = modalVideo.querySelectorAll('source');
+            sources.forEach(source => {
+                source.src = src;
+            });
+            
+            modalVideo.src = src;
+            modalVideo.load(); // Força o carregamento do vídeo
+            
+            // Reproduz automaticamente quando o vídeo carregar
+            modalVideo.onloadeddata = function() {
+                modalVideo.play().catch(function(error) {
+                    console.log('Reprodução automática bloqueada pelo navegador');
+                });
+                
+                // Mostra o indicador de vídeo mutado
+                setTimeout(() => {
+                    mutedIndicator.classList.add('show');
+                }, 1000);
+            };
+            
+            // Ativa o som quando o usuário interagir com o vídeo
+            modalVideo.addEventListener('click', function() {
+                if (modalVideo.muted) {
+                    modalVideo.muted = false;
+                    mutedIndicator.classList.remove('show');
+                }
+            });
+            
+            // Esconde completamente as informações para vídeos
+            modalInfo.style.display = 'none';
+            
+            // Centraliza o botão de download para vídeos
+            modalDownload.classList.add('centered');
+            
+        } else {
+            modalVideo.style.display = 'none';
+            modalImg.style.display = 'block';
+            modalImg.src = src;
+            modalTitle.textContent = `Imagem ${type.toUpperCase()}`;
+            
+            // Mostra as informações para imagens
+            modalInfo.style.display = 'block';
+            modalSize.classList.remove('hidden');
+            modalType.classList.remove('hidden');
+            modalTitle.classList.remove('hidden');
+            
+            // Remove a centralização do botão de download para imagens
+            modalDownload.classList.remove('centered');
+            
+            // Verifica se a imagem ocupa toda a tela após carregar
+            modalImg.onload = function() {
+                checkImageSize();
+            };
+            
+            // Oculta o indicador de vídeo mutado ao abrir imagens
+            mutedIndicator.classList.remove('show');
+        }
+        
+        modalType.textContent = type;
+        modalSize.textContent = size;
+        modalDownload.href = src;
+        modalDownload.download = `arquivo.${type.toLowerCase()}`;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Função para verificar o tamanho da imagem
+    function checkImageSize() {
+        const img = modalImg;
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Aguarda um frame para garantir que a imagem foi renderizada
+        requestAnimationFrame(() => {
+            const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+            const modalAspectRatio = modalContent.clientWidth / modalContent.clientHeight;
+            
+            // Se a imagem está sendo redimensionada para caber na tela (não ocupa toda a tela)
+            if (imgAspectRatio > modalAspectRatio) {
+                // Imagem é mais larga que alta - pode ocupar toda a largura
+                if (img.clientWidth >= modalContent.clientWidth * 0.95) {
+                    modalSize.classList.add('hidden');
+                } else {
+                    modalSize.classList.remove('hidden');
+                }
+            } else {
+                // Imagem é mais alta que larga - pode ocupar toda a altura
+                if (img.clientHeight >= modalContent.clientHeight * 0.95) {
+                    modalSize.classList.add('hidden');
+                } else {
+                    modalSize.classList.remove('hidden');
+                }
+            }
+        });
+    }
+
+    // Função para fechar o modal
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Remove tela cheia se estiver ativa
+        if (isVideoFullscreen) {
+            exitFullscreen();
+        }
+        
+        // Pausa o vídeo quando fechar o modal
+        if (modalVideo.style.display !== 'none') {
+            modalVideo.pause();
+            modalVideo.currentTime = 0; // Volta para o início
+        }
+    }
+
+    // Função para entrar em tela cheia
+    function enterFullscreen() {
+        modalVideo.classList.add('fullscreen');
+        isVideoFullscreen = true;
+        
+        // Desmuta o vídeo quando entrar em tela cheia
+        modalVideo.muted = false;
+        mutedIndicator.classList.remove('show');
+        
+        // Esconde outros elementos quando em tela cheia
+        modalClose.style.display = 'none';
+        modalDownload.style.display = 'none';
+        modalInfo.style.display = 'none';
+    }
+
+    // Função para sair da tela cheia
+    function exitFullscreen() {
+        modalVideo.classList.remove('fullscreen');
+        isVideoFullscreen = false;
+        
+        // Mostra outros elementos novamente
+        modalClose.style.display = 'flex';
+        modalDownload.style.display = 'flex';
+        
+        // Para vídeos, mantém as informações ocultas
+        // Para imagens, mostra as informações
+        if (modalImg.style.display !== 'none') {
+            modalInfo.style.display = 'block';
+        }
+        
+        // Pausa o vídeo quando sair da tela cheia
+        modalVideo.pause();
+    }
+
+    // Adiciona evento de clique em cada item da galeria
+    items.forEach(item => {
+        item.addEventListener('click', function() {
+            const video = this.querySelector('video');
+            const img = this.querySelector('img');
+            const type = this.querySelector('.file-type').textContent;
+            const size = this.querySelector('.file-info span:last-child').textContent;
+            
+            if (video) {
+                // É um vídeo
+                openModal(video.src, type, size, true);
+            } else if (img) {
+                // É uma imagem
+                openModal(img.src, type, size, false);
+            }
+        });
+    });
+
+    // Fecha o modal ao clicar no X
+    modalClose.addEventListener('click', closeModal);
+
+    // Fecha o modal ao clicar fora da imagem
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Pausa o vídeo quando clicar fora dele no modal
+    modalContent.addEventListener('click', function(e) {
+        if (e.target === modalContent && modalVideo.style.display !== 'none') {
+            modalVideo.pause();
+        }
+    });
+
+    // Fecha o modal com a tecla ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (isVideoFullscreen) {
+                exitFullscreen();
+            } else if (modal.classList.contains('active')) {
+                closeModal();
+            }
+            
+            // Pausa o vídeo em qualquer caso
+            if (modalVideo.style.display !== 'none') {
+                modalVideo.pause();
+            }
+        }
+    });
+
+    // Verifica o tamanho da imagem quando a janela é redimensionada
+    window.addEventListener('resize', function() {
+        if (modal.classList.contains('active')) {
+            checkImageSize();
+        }
+    });
+
+    // Garante que o vídeo pare quando o modal for fechado
+    window.addEventListener('beforeunload', function() {
+        if (modalVideo.style.display !== 'none') {
+            modalVideo.pause();
+        }
+    });
+
+    searchInput.addEventListener('input', filterItems);
+    typeFilter.addEventListener('change', filterItems);
+
+    // Pré-carregar todos os vídeos da galeria
+    document.querySelectorAll('.galeria-item video').forEach(function(video) {
+        video.load();
+    });
+});
+</script>
+{% endblock %} 

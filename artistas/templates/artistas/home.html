@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria++</title>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400" rel="stylesheet">
+    <link href="{% static 'artistas/css/styles.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="spa-content">
+    <div class="artistas-container">
+            <a href="{% url 'visao' %}" class="artista">
+                <img src="{% static 'artistas/images/URIAS_INDEX.png' %}" alt="URIAS">
+            </a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica se já existe uma permissão salva
+            const audioPermission = localStorage.getItem('audioPermission');
+            
+            // Se não existir permissão salva, pergunta ao usuário
+            if (audioPermission === null) {
+                alert('Para uma melhor experiência, permita a reprodução de áudio ao passar o mouse sobre os álbuns.');
+                localStorage.setItem('audioPermission', 'granted');
+            }
+        });
+    </script>
+</body>
+</html> 

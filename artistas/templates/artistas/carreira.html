@@ -1,0 +1,581 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carreira - URIAS | Galeria++</title>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400" rel="stylesheet">
+    <link href="{% static 'artistas/css/styles.css' %}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Canela';
+            src: url("{% static 'artistas/fonts/Canela-Regular.woff2' %}") format('woff2'),
+                 url("{% static 'artistas/fonts/Canela-Regular.woff' %}") format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background: url('/media/background/BACKGROUND.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #2C1810;
+            font-family: 'Canela', serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .carreira-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .carreira-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .carreira-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, #2C1810, #8B7355);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .carreira-subtitle {
+            font-size: 1.2rem;
+            color: #2C1810;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .carreira-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #8B7355;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin: 0 auto 2rem;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .carreira-image:hover {
+            transform: scale(1.05);
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #8B7355, #A67B5B);
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to top, #E6D5C3, #A67B5B);
+            transform: translateX(-50%);
+            z-index: 5;
+            height: 0%;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(100px);
+        }
+
+        .timeline-content {
+            background: rgba(139, 115, 85, 0.15);
+            border: 1px solid rgba(139, 115, 85, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .timeline-content:hover {
+            background: rgba(139, 115, 85, 0.25);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: 50%;
+            padding-right: 3rem;
+            transform: translateX(-50px);
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50%;
+            margin-right: 0;
+            padding-left: 3rem;
+            transform: translateX(50px);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            width: 20px;
+            height: 20px;
+            background: #A67B5B;
+            border: 4px solid #8B7355;
+            border-radius: 50%;
+            transform: translateX(-50%) scale(0);
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(166, 123, 91, 0.5);
+        }
+
+        .timeline-item.active .timeline-dot {
+            transform: translateX(-50%) scale(1);
+            background: #E6D5C3;
+            box-shadow: 0 0 30px rgba(230, 213, 195, 0.8);
+        }
+
+        .timeline-year {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8B7355;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #2C1810;
+        }
+
+        .timeline-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2C1810;
+            opacity: 0.9;
+        }
+
+        .stats-section {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(139, 115, 85, 0.15);
+            border: 1px solid rgba(139, 115, 85, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .stat-item:hover {
+            background: rgba(139, 115, 85, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #8B7355;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #2C1810;
+            opacity: 0.9;
+        }
+
+        .botao-voltar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background-color: #8B7355;
+            color: white;
+            border: 2px solid #8B7355;
+            padding: 10px 20px;
+            font-family: 'Canela', serif;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .botao-voltar:hover {
+            background-color: #A67B5B;
+            border-color: #A67B5B;
+            transform: translateX(-5px);
+        }
+
+        .botao-voltar::before {
+            content: '←';
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .carreira-title {
+                font-size: 2.5rem;
+            }
+
+            .carreira-image {
+                width: 250px;
+                height: 250px;
+            }
+
+            .timeline-line,
+            .timeline-progress {
+                left: 20px;
+            }
+
+            .timeline-progress {
+                bottom: 0;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 50px;
+                margin-right: 0;
+                padding-left: 2rem;
+                padding-right: 1rem;
+                transform: translateX(0);
+            }
+
+            .timeline-dot {
+                left: 20px;
+                transform: translateX(-50%) scale(0);
+            }
+
+            .timeline-item.active .timeline-dot {
+                transform: translateX(-50%) scale(1);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .botao-voltar {
+                top: 15px;
+                left: 15px;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carreira-container {
+                padding: 1rem;
+            }
+
+            .carreira-title {
+                font-size: 2rem;
+            }
+
+            .carreira-image {
+                width: 200px;
+                height: 200px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'visao' %}" class="botao-voltar">Voltar</a>
+    
+    <div class="carreira-container">
+        <div class="carreira-header">
+            <h1 class="carreira-title">Carreira</h1>
+            <p class="carreira-subtitle">A trajetória de URIAS na música</p>
+            <img src="{% static 'artistas/images/galeria/Urias (21).jpg' %}" alt="URIAS" class="carreira-image">
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-line"></div>
+            <div class="timeline-progress"></div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2018</div>
+                    <h3 class="timeline-title">Início da Jornada</h3>
+                    <p class="timeline-description">
+                        URIAS começa sua carreira musical, lançando suas primeiras músicas e estabelecendo sua identidade artística única no cenário musical brasileiro.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2019</div>
+                    <h3 class="timeline-title">Primeiro EP</h3>
+                    <p class="timeline-description">
+                        Lançamento do primeiro EP, marcando o início de uma nova era na música eletrônica brasileira, com influências de techno e música experimental.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2020</div>
+                    <h3 class="timeline-title">Hermind</h3>
+                    <p class="timeline-description">
+                        Lançamento do álbum "Hermind", que consolidou URIAS como uma das principais artistas do techno brasileiro, com críticas positivas e reconhecimento internacional.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2021</div>
+                    <h3 class="timeline-title">Fúria</h3>
+                    <p class="timeline-description">
+                        O álbum "Fúria" representa um momento de maturidade artística, com letras mais profundas e uma sonoridade ainda mais experimental e ousada.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2022</div>
+                    <h3 class="timeline-title">URIAS</h3>
+                    <p class="timeline-description">
+                        O álbum homônimo "URIAS" marca o ápice de sua carreira até então, com uma produção impecável e uma visão artística completamente desenvolvida.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2023-2024</div>
+                    <h3 class="timeline-title">Reconhecimento Internacional</h3>
+                    <p class="timeline-description">
+                        URIAS conquista reconhecimento internacional, participando de festivais importantes e colaborando com artistas renomados do cenário eletrônico mundial.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2 style="font-size: 2.5rem; margin-bottom: 2rem; color: #2C1810;">Números da Carreira</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <div class="stat-label">Álbuns Lançados</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <div class="stat-label">Músicas Produzidas</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100+</span>
+                    <div class="stat-label">Shows Realizados</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">1M+</span>
+                    <div class="stat-label">Streams Globais</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Registrar o plugin ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animação inicial do header
+        gsap.from('.carreira-header', {
+            duration: 1.5,
+            y: -100,
+            opacity: 0,
+            ease: 'power3.out'
+        });
+
+        // Animação da imagem
+        gsap.from('.carreira-image', {
+            duration: 1.2,
+            scale: 0.8,
+            opacity: 0,
+            ease: 'back.out(1.7)',
+            delay: 0.5
+        });
+
+        // Animação dos itens da timeline
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        timelineItems.forEach((item, index) => {
+            gsap.fromTo(item, {
+                opacity: 0,
+                y: 100,
+                x: index % 2 === 0 ? -50 : 50
+            }, {
+                opacity: 1,
+                y: 0,
+                x: 0,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 80%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+
+            // Animação dos dots da timeline
+            gsap.fromTo(item.querySelector('.timeline-dot'), {
+                scale: 0,
+                opacity: 0
+            }, {
+                scale: 1,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'back.out(1.7)',
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 80%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        });
+
+        // Animação da linha do tempo
+        gsap.set('.timeline-progress', { height: '0%' });
+        
+        gsap.to('.timeline-progress', {
+            height: '100%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.timeline',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+
+        // Animação dos stats
+        const statItems = document.querySelectorAll('.stat-item');
+        statItems.forEach((item, index) => {
+            gsap.fromTo(item, {
+                opacity: 0,
+                y: 50
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 85%',
+                    end: 'bottom 15%',
+                    toggleActions: 'play none none reverse'
+                },
+                delay: index * 0.1
+            });
+        });
+
+        // Animação dos números dos stats
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach((number) => {
+            const finalValue = number.textContent;
+            const isPlus = finalValue.includes('+');
+            const numericValue = parseInt(finalValue.replace(/\D/g, ''));
+            
+            gsap.fromTo(number, {
+                textContent: 0
+            }, {
+                textContent: isPlus ? numericValue + '+' : numericValue,
+                duration: 2,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: number,
+                    start: 'top 85%',
+                    end: 'bottom 15%',
+                    toggleActions: 'play none none reverse'
+                },
+                snap: { textContent: 1 }
+            });
+        });
+
+        // Efeito parallax suave no background
+        gsap.to('body', {
+            backgroundPosition: '50% 100%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: 'body',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+
+        // Adicionar classe active aos itens da timeline quando visíveis
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html> 
