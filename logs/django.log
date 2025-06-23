@@ -1,0 +1,26 @@
+INFO 2025-06-21 18:01:22,173 autoreload 62576 69184 Watching for file changes with StatReloader
+INFO 2025-06-21 18:01:38,657 basehttp 62576 66172 "GET / HTTP/1.1" 200 1331
+INFO 2025-06-21 18:01:38,729 basehttp 62576 66172 "GET /static/artistas/css/styles.css HTTP/1.1" 304 0
+INFO 2025-06-21 18:01:44,068 autoreload 62576 69184 C:\Users\Maxwell\Documents\Projetos\Galeria++\artistas\views.py changed, reloading.
+INFO 2025-06-21 18:01:45,677 autoreload 40540 54308 Watching for file changes with StatReloader
+INFO 2025-06-21 18:02:12,126 autoreload 40540 54308 C:\Users\Maxwell\Documents\Projetos\Galeria++\artistas\views.py changed, reloading.
+INFO 2025-06-21 18:02:13,750 autoreload 66320 69472 Watching for file changes with StatReloader
+INFO 2025-06-21 18:02:22,027 autoreload 66320 69472 C:\Users\Maxwell\Documents\Projetos\Galeria++\artistas\views.py changed, reloading.
+INFO 2025-06-21 19:52:03,975 autoreload 74984 75688 Watching for file changes with StatReloader
+INFO 2025-06-21 19:53:13,703 basehttp 74984 77532 "GET /galeria/?busca=&tipo= HTTP/1.1" 200 78967
+INFO 2025-06-21 19:53:13,770 basehttp 74984 77532 - Broken pipe from ('127.0.0.1', 61152)
+INFO 2025-06-21 19:53:13,775 basehttp 74984 75908 "GET /static/artistas/js/video-optimizer.js HTTP/1.1" 200 10386
+INFO 2025-06-21 19:53:14,062 basehttp 74984 74996 - Broken pipe from ('127.0.0.1', 61157)
+INFO 2025-06-21 19:53:14,063 basehttp 74984 75908 - Broken pipe from ('127.0.0.1', 61153)
+INFO 2025-06-21 19:53:14,066 basehttp 74984 77928 - Broken pipe from ('127.0.0.1', 61154)
+INFO 2025-06-21 19:53:16,687 basehttp 74984 71164 "GET /static/artistas/images/galeria/Urias%20-%20Cadela%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 50275468
+INFO 2025-06-21 19:53:17,130 basehttp 74984 71948 "GET /static/artistas/images/galeria/Urias%20-%20Trip%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 66729926
+INFO 2025-06-21 19:53:17,544 basehttp 74984 75736 "GET /static/artistas/images/galeria/Urias%20-%20Ultimate%20One%20Remix%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 76513627
+INFO 2025-06-21 19:53:17,603 basehttp 74984 64652 "GET /static/artistas/images/galeria/Urias%20-%20R.I.P.%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 73581687
+INFO 2025-06-21 19:53:17,673 basehttp 74984 73896 "GET /static/artistas/images/galeria/Urias%20-%20Her%20Mind%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 77584130
+WARNING 2025-06-21 19:53:26,557 log 74984 25292 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-21 19:53:26,558 basehttp 74984 25292 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4894
+INFO 2025-06-21 19:53:32,792 basehttp 74984 71164 - Broken pipe from ('127.0.0.1', 61158)
+INFO 2025-06-21 19:53:32,796 basehttp 74984 73896 - Broken pipe from ('127.0.0.1', 61159)
+INFO 2025-06-21 19:53:38,443 basehttp 74984 25292 "GET /static/artistas/images/galeria/Urias%20-%20Cadela%20(Official%20Live%20Performance%20%40%20Her%20Mind%20Last%20Show).mp4 HTTP/1.1" 200 50275468
+INFO 2025-06-21 19:54:03,235 autoreload 74984 75688 C:\Users\Maxwell\Documents\Projetos\Galeria++\galeria\settings.py changed, reloading.

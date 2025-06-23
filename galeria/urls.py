@@ -23,6 +23,6 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('artistas.urls')),
+    path('', include('artistas.urls', namespace='artistas')),
     path('visao/', views.visao, name='visao'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

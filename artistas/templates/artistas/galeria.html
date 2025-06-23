@@ -177,22 +177,67 @@
 
     .back-button {
         position: fixed;
-        top: 20px;
-        left: 20px;
-        background: rgba(139, 107, 74, 0.2);
-        color: #8B6B4A;
-        padding: 10px 20px;
-        border-radius: 5px;
+        top: 25px;
+        left: 25px;
+        z-index: 1000;
+        background: linear-gradient(135deg, #8B7355 0%, #A67B5B 100%);
+        color: #E6D5C3;
         text-decoration: none;
-        z-index: 10;
+        padding: 12px 24px;
+        border-radius: 50px;
         font-family: 'Canela', serif;
-        font-weight: normal;
-        transition: all 0.3s ease;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    .back-button::before {
+        content: '←';
+        font-size: 18px;
+        font-weight: bold;
+        transition: transform 0.3s ease;
     }
 
     .back-button:hover {
-        background: rgba(139, 107, 74, 0.3);
-        transform: translateX(-5px);
+        background: linear-gradient(135deg, #A67B5B 0%, #C19A6B 100%);
+        color: #FFFFFF;
+        transform: translateX(-5px) translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 115, 85, 0.4);
+        border-color: rgba(230, 213, 195, 0.3);
+    }
+
+    .back-button:hover::before {
+        transform: translateX(-3px);
+    }
+
+    .back-button:active {
+        transform: translateX(-3px) translateY(0);
+        box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .back-button {
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .back-button {
+            top: 15px;
+            left: 15px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
     }
 
     .no-results {
@@ -513,7 +558,7 @@
     }
 </style>
 
-<a href="{% url 'home' %}" class="back-button">← Voltar</a>
+<a href="{% url 'artistas:visao' %}" class="back-button">Voltar</a>
 
 <div class="galeria-container">
     <div class="galeria-header">
@@ -528,20 +573,23 @@
     </div>
 
     <div class="search-container">
-        <input type="text" class="search-input" placeholder="Buscar imagens..." id="searchInput">
-        <select class="filter-select" id="typeFilter">
-            <option value="">Todos os tipos</option>
-            <option value="image">Imagens</option>
-            <option value="video">Vídeos</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="gif">GIF</option>
-            <option value="webp">WebP</option>
-            <option value="mp4">MP4</option>
-            <option value="avi">AVI</option>
-            <option value="mov">MOV</option>
-            <option value="webm">WebM</option>
-        </select>
+        <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center; width: 100%;">
+            <input type="text" name="busca" class="search-input" placeholder="Buscar imagens..." id="searchInput" value="{{ filtro_busca|default:'' }}">
+            <select name="tipo" class="filter-select" id="typeFilter">
+                <option value="" {% if not filtro_tipo %}selected{% endif %}>Todos os tipos</option>
+                <option value="image" {% if filtro_tipo == 'image' %}selected{% endif %}>Imagens</option>
+                <option value="video" {% if filtro_tipo == 'video' %}selected{% endif %}>Vídeos</option>
+                <option value="jpg" {% if filtro_tipo == 'jpg' %}selected{% endif %}>JPG</option>
+                <option value="png" {% if filtro_tipo == 'png' %}selected{% endif %}>PNG</option>
+                <option value="gif" {% if filtro_tipo == 'gif' %}selected{% endif %}>GIF</option>
+                <option value="webp" {% if filtro_tipo == 'webp' %}selected{% endif %}>WebP</option>
+                <option value="mp4" {% if filtro_tipo == 'mp4' %}selected{% endif %}>MP4</option>
+                <option value="avi" {% if filtro_tipo == 'avi' %}selected{% endif %}>AVI</option>
+                <option value="mov" {% if filtro_tipo == 'mov' %}selected{% endif %}>MOV</option>
+                <option value="webm" {% if filtro_tipo == 'webm' %}selected{% endif %}>WebM</option>
+            </select>
+            <button type="submit" style="padding: 0.8rem 1.5rem; border: none; background: #8B6B4A; color: #fff; border-radius: 5px; font-family: 'Canela', serif; font-size: 1rem; cursor: pointer;">Filtrar</button>
+        </form>
     </div>
 
     <div class="galeria-grid" id="galeriaGrid">
@@ -608,8 +656,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const typeFilter = document.getElementById('typeFilter');
     const galeriaGrid = document.getElementById('galeriaGrid');
     const items = document.querySelectorAll('.galeria-item');
     const modal = document.getElementById('imageModal');
@@ -625,111 +671,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const mutedIndicator = modal.querySelector('.video-muted-indicator');
     let isVideoFullscreen = false;
 
-    function filterItems() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const selectedType = typeFilter.value.toLowerCase();
-
-        items.forEach(item => {
-            const nome = item.dataset.nome;
-            const tipo = item.dataset.tipo;
-            const midia = item.dataset.midia;
-            const matchesSearch = nome.includes(searchTerm);
-            
-            // Verifica se corresponde ao filtro de tipo
-            let matchesType = true;
-            if (selectedType) {
-                if (selectedType === 'image' || selectedType === 'video') {
-                    matchesType = midia === selectedType;
-                } else {
-                    matchesType = tipo === selectedType;
-                }
-            }
-
-            item.style.display = matchesSearch && matchesType ? 'block' : 'none';
-        });
-
-        // Verifica se há resultados
-        const visibleItems = document.querySelectorAll('.galeria-item[style="display: block"]');
-        if (visibleItems.length === 0) {
-            if (!document.querySelector('.no-results')) {
-                const noResults = document.createElement('div');
-                noResults.className = 'no-results';
-                noResults.innerHTML = '<h3>Nenhuma imagem encontrada</h3><p>Tente ajustar os filtros de busca.</p>';
-                galeriaGrid.appendChild(noResults);
-            }
-        } else {
-            const noResults = document.querySelector('.no-results');
-            if (noResults) {
-                noResults.remove();
-            }
-        }
-    }
-
     // Função para abrir o modal
     function openModal(src, type, size, isVideo) {
         if (isVideo) {
             modalImg.style.display = 'none';
             modalVideo.style.display = 'block';
-            
-            // Configura as sources do vídeo
             const sources = modalVideo.querySelectorAll('source');
             sources.forEach(source => {
                 source.src = src;
             });
-            
             modalVideo.src = src;
-            modalVideo.load(); // Força o carregamento do vídeo
-            
-            // Reproduz automaticamente quando o vídeo carregar
+            modalVideo.load();
             modalVideo.onloadeddata = function() {
-                modalVideo.play().catch(function(error) {
-                    console.log('Reprodução automática bloqueada pelo navegador');
-                });
-                
-                // Mostra o indicador de vídeo mutado
+                modalVideo.play().catch(function(error) {});
                 setTimeout(() => {
                     mutedIndicator.classList.add('show');
                 }, 1000);
             };
-            
-            // Ativa o som quando o usuário interagir com o vídeo
             modalVideo.addEventListener('click', function() {
                 if (modalVideo.muted) {
                     modalVideo.muted = false;
                     mutedIndicator.classList.remove('show');
                 }
             });
-            
-            // Esconde completamente as informações para vídeos
             modalInfo.style.display = 'none';
-            
-            // Centraliza o botão de download para vídeos
             modalDownload.classList.add('centered');
-            
         } else {
             modalVideo.style.display = 'none';
             modalImg.style.display = 'block';
             modalImg.src = src;
             modalTitle.textContent = `Imagem ${type.toUpperCase()}`;
-            
-            // Mostra as informações para imagens
             modalInfo.style.display = 'block';
             modalSize.classList.remove('hidden');
             modalType.classList.remove('hidden');
             modalTitle.classList.remove('hidden');
-            
-            // Remove a centralização do botão de download para imagens
             modalDownload.classList.remove('centered');
-            
-            // Verifica se a imagem ocupa toda a tela após carregar
             modalImg.onload = function() {
                 checkImageSize();
             };
-            
-            // Oculta o indicador de vídeo mutado ao abrir imagens
             mutedIndicator.classList.remove('show');
         }
-        
         modalType.textContent = type;
         modalSize.textContent = size;
         modalDownload.href = src;
@@ -742,22 +723,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkImageSize() {
         const img = modalImg;
         const modalContent = modal.querySelector('.modal-content');
-        
-        // Aguarda um frame para garantir que a imagem foi renderizada
         requestAnimationFrame(() => {
             const imgAspectRatio = img.naturalWidth / img.naturalHeight;
             const modalAspectRatio = modalContent.clientWidth / modalContent.clientHeight;
-            
-            // Se a imagem está sendo redimensionada para caber na tela (não ocupa toda a tela)
             if (imgAspectRatio > modalAspectRatio) {
-                // Imagem é mais larga que alta - pode ocupar toda a largura
                 if (img.clientWidth >= modalContent.clientWidth * 0.95) {
                     modalSize.classList.add('hidden');
                 } else {
                     modalSize.classList.remove('hidden');
                 }
             } else {
-                // Imagem é mais alta que larga - pode ocupar toda a altura
                 if (img.clientHeight >= modalContent.clientHeight * 0.95) {
                     modalSize.classList.add('hidden');
                 } else {
@@ -771,16 +746,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
-        
-        // Remove tela cheia se estiver ativa
         if (isVideoFullscreen) {
             exitFullscreen();
         }
-        
-        // Pausa o vídeo quando fechar o modal
         if (modalVideo.style.display !== 'none') {
             modalVideo.pause();
-            modalVideo.currentTime = 0; // Volta para o início
+            modalVideo.currentTime = 0;
         }
     }
 
@@ -788,12 +759,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function enterFullscreen() {
         modalVideo.classList.add('fullscreen');
         isVideoFullscreen = true;
-        
-        // Desmuta o vídeo quando entrar em tela cheia
         modalVideo.muted = false;
         mutedIndicator.classList.remove('show');
-        
-        // Esconde outros elementos quando em tela cheia
         modalClose.style.display = 'none';
         modalDownload.style.display = 'none';
         modalInfo.style.display = 'none';
@@ -803,18 +770,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function exitFullscreen() {
         modalVideo.classList.remove('fullscreen');
         isVideoFullscreen = false;
-        
-        // Mostra outros elementos novamente
         modalClose.style.display = 'flex';
         modalDownload.style.display = 'flex';
-        
-        // Para vídeos, mantém as informações ocultas
-        // Para imagens, mostra as informações
         if (modalImg.style.display !== 'none') {
             modalInfo.style.display = 'block';
         }
-        
-        // Pausa o vídeo quando sair da tela cheia
         modalVideo.pause();
     }
 
@@ -825,35 +785,25 @@ document.addEventListener('DOMContentLoaded', function() {
             const img = this.querySelector('img');
             const type = this.querySelector('.file-type').textContent;
             const size = this.querySelector('.file-info span:last-child').textContent;
-            
             if (video) {
-                // É um vídeo
                 openModal(video.src, type, size, true);
             } else if (img) {
-                // É uma imagem
                 openModal(img.src, type, size, false);
             }
         });
     });
 
-    // Fecha o modal ao clicar no X
     modalClose.addEventListener('click', closeModal);
-
-    // Fecha o modal ao clicar fora da imagem
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal();
         }
     });
-
-    // Pausa o vídeo quando clicar fora dele no modal
     modalContent.addEventListener('click', function(e) {
         if (e.target === modalContent && modalVideo.style.display !== 'none') {
             modalVideo.pause();
         }
     });
-
-    // Fecha o modal com a tecla ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (isVideoFullscreen) {
@@ -861,34 +811,20 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (modal.classList.contains('active')) {
                 closeModal();
             }
-            
-            // Pausa o vídeo em qualquer caso
             if (modalVideo.style.display !== 'none') {
                 modalVideo.pause();
             }
         }
     });
-
-    // Verifica o tamanho da imagem quando a janela é redimensionada
     window.addEventListener('resize', function() {
         if (modal.classList.contains('active')) {
             checkImageSize();
         }
     });
-
-    // Garante que o vídeo pare quando o modal for fechado
     window.addEventListener('beforeunload', function() {
         if (modalVideo.style.display !== 'none') {
             modalVideo.pause();
         }
-    });
-
-    searchInput.addEventListener('input', filterItems);
-    typeFilter.addEventListener('change', filterItems);
-
-    // Pré-carregar todos os vídeos da galeria
-    document.querySelectorAll('.galeria-item video').forEach(function(video) {
-        video.load();
     });
 });
 </script>

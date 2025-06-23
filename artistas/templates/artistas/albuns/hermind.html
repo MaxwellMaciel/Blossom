@@ -3,6 +3,14 @@
 
 {% block content %}
 <style>
+    /* Background específico para o álbum Hermind */
+    body {
+        background-image: url("{% static 'artistas/images/BACKGROUND_HERMIND.png' %}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+    }
+
     .album-container {
         display: flex;
         flex-direction: column;
@@ -86,18 +94,65 @@
 
     .back-button {
         position: fixed;
-        top: 20px;
-        left: 20px;
-        background: rgba(199, 21, 133, 0.2);
-        color: #C71585;
-        padding: 10px 20px;
-        border-radius: 5px;
+        top: 25px;
+        left: 25px;
+        z-index: 1000;
+        background: #C71585;
+        color: #FFFFFF;
         text-decoration: none;
-        z-index: 10;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-family: 'Canela', serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        border: 2px solid #C71585;
+        box-shadow: 0 4px 15px rgba(199, 21, 133, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .back-button::before {
+        font-size: 18px;
+        font-weight: bold;
+        transition: transform 0.3s ease;
     }
 
     .back-button:hover {
-        background: rgba(199, 21, 133, 0.3);
+        background: #A0126B;
+        color: #FFFFFF;
+        transform: translateX(-5px) translateY(-2px);
+        box-shadow: 0 8px 25px rgba(199, 21, 133, 0.4);
+        border-color: #A0126B;
+    }
+
+    .back-button:hover::before {
+        transform: translateX(-3px);
+    }
+
+    .back-button:active {
+        transform: translateX(-3px) translateY(0);
+        box-shadow: 0 4px 15px rgba(199, 21, 133, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .back-button {
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .back-button {
+            top: 15px;
+            left: 15px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
     }
 
     .track-list {
@@ -108,30 +163,6 @@
     .track-list h2 {
         color: #C71585;
         margin-bottom: 1rem;
-    }
-
-    .track {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: rgba(199, 21, 133, 0.1);
-        margin-bottom: 0.5rem;
-        border-radius: 5px;
-        color: #8B4A6B;
-        border: 1px solid rgba(199, 21, 133, 0.2);
-    }
-
-    .track-number {
-        width: 30px;
-        color: #C71585;
-    }
-
-    .track-title {
-        flex: 1;
-    }
-
-    .track-duration {
-        color: #8B4A6B;
     }
 
     @media (max-width: 768px) {
@@ -184,7 +215,7 @@
     }
 </style>
 
-<a href="{% url 'albuns' %}" class="back-button">← Voltar</a>
+<a href="{% url 'artistas:albuns' %}" class="back-button">← Voltar</a>
 
 <div class="album-container">
     <div class="album-header">
@@ -199,9 +230,11 @@
             </div>
         </div>
         <div class="album-info">
-            <h1>Hermind</h1>
-            <p>O terceiro álbum de Urias, "Hermind", lançado em 2022, representa uma evolução ainda mais profunda em sua carreira. Com uma sonoridade mais experimental e letras mais introspectivas, o álbum explora temas de identidade, transformação e autodescoberta.</p>
-            <p>O álbum apresenta uma fusão única de pop, R&B e música eletrônica, consolidando Urias como uma das artistas mais inovadoras da música brasileira contemporânea.</p>
+            <h1>HER MIND</h1>
+            <p><strong>HER MIND</strong> é o terceiro álbum de Urias, lançado em 8 de junho de 2023 pela Mataderos. O disco marca uma evolução na carreira da artista, trazendo uma sonoridade experimental e letras profundas sobre identidade, transformação e autodescoberta.</p>
+            <p>Musicalmente, o álbum mistura pop, R&B alternativo, eletrônica, house, funk paulista e ritmos latinos, além de faixas em português, espanhol, inglês e francês. Essa diversidade reforça o alcance internacional de Urias e sua forte brasilidade, com instrumentos como cuíca e berimbau.</p>
+            <p>O conceito do álbum foi inspirado em um estudo científico sobre cérebros trans, influenciando tanto a estética quanto as escolhas sonoras. A produção é assinada por Maffalda e Brabo Music, com participações de Gorky, Zebu, Number Teddie, Davi Sabbag e Alice Caymmi. Em novembro de 2023, foi lançada a edição deluxe, <em>Her Mind – Blossom Edition</em>, com faixas inéditas.</p>
+            <p><strong>HER MIND</strong> consolida Urias como uma das vozes mais inovadoras da música brasileira, reforçando seu compromisso com a representatividade trans e a experimentação musical.</p>
         </div>
     </div>
 

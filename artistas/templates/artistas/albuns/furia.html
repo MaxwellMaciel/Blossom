@@ -5,7 +5,7 @@
 <style>
     /* Background específico para o álbum Fúria */
     body {
-        background-image: url('../../../media/background/BACKGROUND_FURIA.png') !important;
+        background-image: url("{% static 'artistas/images/BACKGROUND_FURIA.png' %}") !important;
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
@@ -92,20 +92,76 @@
         color: white;
     }
 
+    .album-info strong {
+        font-weight: 600;
+    }
+
+    .album-info em {
+        font-style: italic;
+        font-weight: 500;
+    }
+
     .back-button {
         position: fixed;
-        top: 20px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
+        top: 25px;
+        left: 25px;
+        z-index: 1000;
+        background: #FFFFFF;
+        color: #000000;
         text-decoration: none;
-        z-index: 10;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-family: 'Canela', serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        border: 2px solid #FFFFFF;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .back-button::before {
+        font-size: 18px;
+        font-weight: bold;
+        transition: transform 0.3s ease;
     }
 
     .back-button:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: #F0F0F0;
+        color: #000000;
+        transform: translateX(-5px) translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-color: #F0F0F0;
+    }
+
+    .back-button:hover::before {
+        transform: translateX(-3px);
+    }
+
+    .back-button:active {
+        transform: translateX(-3px) translateY(0);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .back-button {
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .back-button {
+            top: 15px;
+            left: 15px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
     }
 
     .track-list {
@@ -118,29 +174,6 @@
         margin-bottom: 1rem;
     }
 
-    .track {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.1);
-        margin-bottom: 0.5rem;
-        border-radius: 5px;
-        color: white;
-    }
-
-    .track-number {
-        width: 30px;
-        color: white;
-    }
-
-    .track-title {
-        flex: 1;
-    }
-
-    .track-duration {
-        color: white;
-    }
-
     @media (max-width: 768px) {
         .album-header {
             flex-direction: column;
@@ -151,6 +184,24 @@
         .album-cover {
             width: 250px;
             height: 250px;
+        }
+
+        .album-info {
+            padding-left: 0;
+            padding-top: 1.5rem;
+        }
+
+        .album-info h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .album-info p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+            text-align: left;
         }
     }
 
@@ -190,7 +241,7 @@
     }
 </style>
 
-<a href="{% url 'albuns' %}" class="back-button">← Voltar</a>
+<a href="{% url 'artistas:albuns' %}" class="back-button">← Voltar</a>
 
 <div class="album-container">
     <div class="album-header">
@@ -205,9 +256,15 @@
             </div>
         </div>
         <div class="album-info">
-            <h1>Fúria</h1>
-            <p>O segundo álbum de Urias, "Fúria", lançado em 2021, representa uma evolução significativa em sua carreira. Com uma sonoridade mais madura e letras mais profundas, o álbum explora temas de empoderamento, superação e autenticidade.</p>
-            <p>O álbum apresenta uma mistura única de pop, R&B e elementos eletrônicos, consolidando Urias como uma das artistas mais inovadoras da música brasileira contemporânea.</p>
+            <h1>FÚRIA</h1>
+            
+            <p><strong>O segundo trabalho de longa duração da Urias</strong>, FÚRIA (com a 1ª parte lançada em maio de 2021 e o disco completo em janeiro de 2022), representa um <strong>marco de maturidade artística</strong>. Com uma sonoridade mais sofisticada e letras de grande profundidade, o álbum mergulha em temas como empoderamento, superação, identidade e autenticidade.</p>
+            
+            <p><strong>Musicalmente</strong>, a obra é um verdadeiro laboratório criativo, mesclando pop, R&B, hip hop, trap e elementos eletrônicos, com produções de <strong>Rodrigo Gorky, Maffalda e Zebu</strong>. Essa fusão reforça a identidade única da cantora e posiciona Urias como uma das artistas mais inovadoras da música brasileira contemporânea.</p>
+            
+            <p><strong>Letras como em "Racha", "Foi Mal", "Cadela", "Peligrosa" e "Tanto Faz"</strong> evocam emoções autênticas — da fúria ancestral e visceral à vulnerabilidade com força, humanizando a experiência trans dentro e fora do álbum. Urias declara que, com FÚRIA, quis <em>"me humanizar mesmo. Sou gente"</em>, mostrando uma gama de sentimentos — raiva, orgulho, dor e lucidez.</p>
+            
+            <p><strong>O título do álbum</strong> reflete essa fúria transformada em força criativa, nascida da necessidade de reivindicar espaço e voz em um contexto de violência estrutural contra pessoas trans. O resultado é um disco coeso, esteticamente potente e politicamente relevante, que teve destaque nas paradas — inclusive alcançando o <strong>topo do iTunes Brasil</strong> e mais de <strong>12 milhões de streams no Spotify</strong>.</p>
         </div>
     </div>
 
@@ -239,9 +296,6 @@
                 <tr><td>12</td><td>Maserati (com Monna Brutal e Ebony)</td><td>Ebony, Mafalda, Monna Brutal, Rodrigo Gorky, Urias</td><td>Brabo Music</td><td>2:48</td></tr>
                 <tr><td>13</td><td>Tanto Faz</td><td>Rafael Stefanini, Rodrigo Gorky, Urias, Zebu</td><td>Brabo Music</td><td>2:57</td></tr>
             </tbody>
-            <tfoot>
-            <!-- Rodapé removido conforme solicitado -->
-            </tfoot>
         </table>
         </div>
     </div>

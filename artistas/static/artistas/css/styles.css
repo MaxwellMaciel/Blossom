@@ -14,10 +14,11 @@
 
 body {
     font-family: 'Source Sans Pro', sans-serif;
-    background-image: url('../../../media/background/BACKGROUND.PNG');
+    background-image: url('/static/artistas/images/BACKGROUND.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-attachment: fixed;
     min-height: 100vh;
     display: flex;
     flex-direction: column;

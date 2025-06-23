@@ -23,21 +23,21 @@ def galeria(request):
     
     imagens = []
     
+    # Parâmetros de filtro vindos da URL
+    filtro_tipo = request.GET.get('tipo', '').lower()
+    filtro_busca = request.GET.get('busca', '').lower()
+
     # Verifica se a pasta existe
     if os.path.exists(galeria_dir):
         # Lista todos os arquivos na pasta
         for nome_arquivo in os.listdir(galeria_dir):
-            # Verifica se é uma imagem ou vídeo
             extensao = nome_arquivo.lower()
             if (extensao.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.tiff')) or 
                 extensao.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v'))):
                 
                 caminho_completo = os.path.join(galeria_dir, nome_arquivo)
-                
-                # Obtém informações do arquivo
                 try:
                     tamanho = os.path.getsize(caminho_completo)
-                    # Converte para KB ou MB
                     if tamanho < 1024 * 1024:
                         tamanho_formatado = f"{tamanho / 1024:.1f} KB"
                     else:
@@ -45,25 +45,14 @@ def galeria(request):
                 except:
                     tamanho_formatado = "N/A"
                 
-                # Extrai o nome sem extensão
                 nome_sem_extensao = os.path.splitext(nome_arquivo)[0]
-                
-                # Determina o tipo de arquivo
-                tipo_arquivo = os.path.splitext(nome_arquivo)[1].upper().replace('.', '')
+                tipo_arquivo = os.path.splitext(nome_arquivo)[1].lower().replace('.', '')
                 
                 # Determina se é imagem ou vídeo
                 if extensao.endswith(('.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v')):
                     tipo_midia = 'video'
-                    numero_imagem = len([x for x in imagens if x['tipo_midia'] == 'image']) + 1
-                    nome_amigavel = f"Vídeo {numero_imagem}"
                 else:
                     tipo_midia = 'image'
-                    numero_imagem = len([x for x in imagens if x['tipo_midia'] == 'image']) + 1
-                    nome_amigavel = f"Imagem {numero_imagem}"
-                
-                # Cria um nome amigável baseado no número da imagem
-                numero_imagem = len(imagens) + 1
-                nome_amigavel = f"Arquivo {numero_imagem}"
                 
                 imagens.append({
                     'nome': nome_arquivo,
@@ -71,17 +60,26 @@ def galeria(request):
                     'caminho': f'artistas/images/galeria/{nome_arquivo}',
                     'tamanho': tamanho_formatado,
                     'tipo': tipo_arquivo,
-                    'alt': nome_amigavel,
-                    'numero': numero_imagem,
+                    'alt': nome_sem_extensao,
                     'tipo_midia': tipo_midia
                 })
-        
         # Ordena as imagens por nome
         imagens.sort(key=lambda x: x['nome'].lower())
-    
+
+    # Aplica os filtros
+    if filtro_tipo:
+        if filtro_tipo in ['image', 'video']:
+            imagens = [img for img in imagens if img['tipo_midia'] == filtro_tipo]
+        else:
+            imagens = [img for img in imagens if img['tipo'] == filtro_tipo]
+    if filtro_busca:
+        imagens = [img for img in imagens if filtro_busca in img['nome_sem_extensao'].lower()]
+
     return render(request, 'artistas/galeria.html', {
         'imagens': imagens,
-        'total_imagens': len(imagens)
+        'total_imagens': len(imagens),
+        'filtro_tipo': filtro_tipo,
+        'filtro_busca': filtro_busca
     })
 
 def urias_album(request):

@@ -52,17 +52,156 @@
 
     .back-button {
         position: fixed;
-        top: 20px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
+        top: 25px;
+        left: 25px;
+        z-index: 1000;
+        background: linear-gradient(135deg, #8B7355 0%, #A67B5B 100%);
+        color: #E6D5C3;
         text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-family: 'Canela', serif;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(10px);
+    }
+
+    .back-button::before {
+        font-size: 18px;
+        font-weight: bold;
+        transition: transform 0.3s ease;
     }
 
     .back-button:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: linear-gradient(135deg, #A67B5B 0%, #C19A6B 100%);
+        color: #FFFFFF;
+        transform: translateX(-5px) translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 115, 85, 0.4);
+        border-color: rgba(230, 213, 195, 0.3);
+    }
+
+    .back-button:hover::before {
+        transform: translateX(-3px);
+    }
+
+    .back-button:active {
+        transform: translateX(-3px) translateY(0);
+        box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+    }
+
+    .audio-settings-btn {
+        position: fixed;
+        top: 25px;
+        left: 180px;
+        z-index: 1000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8B7355 0%, #A67B5B 100%);
+        color: #E6D5C3;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 15px rgba(139, 115, 85, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .audio-settings-btn:hover {
+        background: linear-gradient(135deg, #A67B5B 0%, #C19A6B 100%);
+        color: #FFFFFF;
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(139, 115, 85, 0.4);
+        border-color: rgba(230, 213, 195, 0.3);
+    }
+
+    .audio-settings-btn.audio-enabled {
+        background: linear-gradient(135deg, #E6D5C3 0%, #C19A6B 100%);
+        color: #8B7355;
+        border-color: rgba(139, 115, 85, 0.3);
+    }
+
+    .audio-settings-btn.audio-disabled {
+        background: linear-gradient(135deg, #8B7355 0%, #6B5B47 100%);
+        color: #E6D5C3;
+        border-color: rgba(230, 213, 195, 0.2);
+    }
+
+    .audio-settings-btn .audio-icon {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .audio-settings-btn:hover .audio-icon {
+        transform: scale(1.2);
+    }
+
+    .audio-settings-btn .audio-icon.rotating {
+        animation: rotateIcon 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes rotateIcon {
+        0% {
+            transform: rotate(0deg) scale(1);
+        }
+        50% {
+            transform: rotate(180deg) scale(1.3);
+        }
+        100% {
+            transform: rotate(360deg) scale(1);
+        }
+    }
+
+    .audio-settings-btn.audio-enabled:hover {
+        background: linear-gradient(135deg, #FFFFFF 0%, #E6D5C3 100%);
+        color: #8B7355;
+    }
+
+    .audio-settings-btn.audio-disabled:hover {
+        background: linear-gradient(135deg, #A67B5B 0%, #8B7355 100%);
+        color: #FFFFFF;
+    }
+
+    @media (max-width: 768px) {
+        .back-button {
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        
+        .audio-settings-btn {
+            top: 20px;
+            left: 140px;
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .back-button {
+            top: 15px;
+            left: 15px;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .audio-settings-btn {
+            top: 15px;
+            left: 120px;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+        }
     }
 
     /* Estilos para o flip card */
@@ -129,7 +268,10 @@
 </style>
 
 <div id="spa-content">
-    <a href="{% url 'home' %}" class="back-button">← Voltar</a>
+    <a href="{% url 'artistas:visao' %}" class="back-button">← Voltar</a>
+    <button id="audioSettingsBtn" class="audio-settings-btn" onclick="toggleAudioSettings()" title="Alternar áudio">
+        <span id="audioIcon">🔊</span>
+    </button>
     <div class="albuns-container">
         <div class="album flip-card" id="urias-album">
             <div class="flip-card-inner">
@@ -171,9 +313,19 @@
 <script>
     // Funções para controlar o áudio do URIAS
     function playUriasAudio() {
+        if (!window.checkAudioPermission()) return;
+        
         const audio = document.getElementById('urias-audio');
         audio.volume = 0.5;
-        audio.play();
+        audio.play().catch(error => {
+            console.log('Erro ao reproduzir áudio Urias:', error);
+            // Se o erro for de autoplay, tenta novamente após um pequeno delay
+            if (error.name === 'NotAllowedError') {
+                setTimeout(() => {
+                    audio.play().catch(e => console.log('Tentativa falhou:', e));
+                }, 100);
+            }
+        });
     }
 
     function pauseUriasAudio() {
@@ -184,9 +336,19 @@
 
     // Funções para Fúria e Hermind
     function playFuriaAudio() {
+        if (!window.checkAudioPermission()) return;
+        
         const audio = document.getElementById('furia-audio');
         audio.volume = 0.5;
-        audio.play();
+        audio.play().catch(error => {
+            console.log('Erro ao reproduzir áudio Fúria:', error);
+            // Se o erro for de autoplay, tenta novamente após um pequeno delay
+            if (error.name === 'NotAllowedError') {
+                setTimeout(() => {
+                    audio.play().catch(e => console.log('Tentativa falhou:', e));
+                }, 100);
+            }
+        });
     }
 
     function pauseFuriaAudio() {
@@ -196,9 +358,19 @@
     }
 
     function playHermindAudio() {
+        if (!window.checkAudioPermission()) return;
+        
         const audio = document.getElementById('hermind-audio');
         audio.volume = 0.5;
-        audio.play();
+        audio.play().catch(error => {
+            console.log('Erro ao reproduzir áudio Hermind:', error);
+            // Se o erro for de autoplay, tenta novamente após um pequeno delay
+            if (error.name === 'NotAllowedError') {
+                setTimeout(() => {
+                    audio.play().catch(e => console.log('Tentativa falhou:', e));
+                }, 100);
+            }
+        });
     }
 
     function pauseHermindAudio() {
@@ -207,8 +379,91 @@
         audio.currentTime = 0;
     }
 
+    // Função para verificar permissão de áudio (fallback)
+    if (typeof window.checkAudioPermission !== 'function') {
+        window.checkAudioPermission = function() {
+            return localStorage.getItem('audioPermission') === 'granted';
+        };
+    }
+
+    // Variável para controlar se o usuário já interagiu com a página
+    let userHasInteracted = false;
+
+    // Função para liberar reprodução de áudio após primeira interação
+    function enableAudioAfterInteraction() {
+        if (!userHasInteracted) {
+            userHasInteracted = true;
+            localStorage.setItem('audioPermission', 'granted');
+            updateAudioButtonAppearance();
+        }
+    }
+
+    // Adiciona eventos para detectar primeira interação do usuário
+    document.addEventListener('click', enableAudioAfterInteraction, { once: true });
+    document.addEventListener('keydown', enableAudioAfterInteraction, { once: true });
+    document.addEventListener('scroll', enableAudioAfterInteraction, { once: true });
+    document.addEventListener('touchstart', enableAudioAfterInteraction, { once: true });
+
+    // Função para alternar configurações de áudio
+    function toggleAudioSettings() {
+        const currentPermission = localStorage.getItem('audioPermission');
+        const audioBtn = document.getElementById('audioSettingsBtn');
+        const audioIcon = document.getElementById('audioIcon');
+        
+        // Adiciona animação de rotação
+        audioIcon.classList.add('rotating');
+        
+        if (currentPermission === 'granted') {
+            // Desabilita áudio
+            localStorage.setItem('audioPermission', 'denied');
+            audioBtn.classList.remove('audio-enabled');
+            audioBtn.classList.add('audio-disabled');
+            
+            // Para todos os áudios
+            pauseUriasAudio();
+            pauseFuriaAudio();
+            pauseHermindAudio();
+        } else {
+            // Habilita áudio
+            localStorage.setItem('audioPermission', 'granted');
+            audioBtn.classList.remove('audio-disabled');
+            audioBtn.classList.add('audio-enabled');
+        }
+        
+        // Remove a classe de animação após a animação terminar
+        setTimeout(() => {
+            audioIcon.classList.remove('rotating');
+            // Atualiza o ícone após a animação
+            if (currentPermission === 'granted') {
+                audioIcon.textContent = '🔇';
+            } else {
+                audioIcon.textContent = '🔊';
+            }
+        }, 500);
+    }
+
+    // Função para atualizar aparência do botão baseado na permissão
+    function updateAudioButtonAppearance() {
+        const audioBtn = document.getElementById('audioSettingsBtn');
+        const audioIcon = document.getElementById('audioIcon');
+        const permission = localStorage.getItem('audioPermission');
+        
+        if (permission === 'granted') {
+            audioBtn.classList.add('audio-enabled');
+            audioBtn.classList.remove('audio-disabled');
+            audioIcon.textContent = '🔊';
+        } else {
+            audioBtn.classList.add('audio-disabled');
+            audioBtn.classList.remove('audio-enabled');
+            audioIcon.textContent = '🔇';
+        }
+    }
+
     // Adiciona os eventos de hover e clique
     document.addEventListener('DOMContentLoaded', function() {
+        // Atualiza aparência do botão
+        updateAudioButtonAppearance();
+        
         const uriasAlbum = document.getElementById('urias-album');
         const furiaAlbum = document.getElementById('furia-album');
         const hermindAlbum = document.getElementById('hermind-album');
@@ -229,6 +484,20 @@
         hermindAlbum.addEventListener('mouseleave', pauseHermindAudio);
         hermindAlbum.addEventListener('click', function() {
             window.location.href = '/albuns/hermind/';
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(audio => {
+            audio.addEventListener('play', function() {
+                audios.forEach(otherAudio => {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                        otherAudio.currentTime = 0;
+                    }
+                });
+            });
         });
     });
 </script>

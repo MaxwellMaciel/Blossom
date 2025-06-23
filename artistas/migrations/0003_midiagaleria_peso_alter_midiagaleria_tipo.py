@@ -21,3 +21,5 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=10),
         ),
     ]
+
+# (ARQUIVO OBSOLETO - modelo MidiaGaleria não será mais usado)

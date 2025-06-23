@@ -1,33 +1,216 @@
+{% extends 'artistas/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeria++</title>
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400" rel="stylesheet">
-    <link href="{% static 'artistas/css/styles.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div id="spa-content">
+
+{% block title %}Galeria++{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    @font-face {
+        font-family: 'Canela';
+        src: url("{% static 'artistas/fonts/Canela-Regular.woff2' %}") format('woff2'),
+             url("{% static 'artistas/fonts/Canela-Regular.woff' %}") format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .audio-permission-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .audio-permission-modal.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .audio-permission-content {
+        background: linear-gradient(135deg, #8B7355 0%, #A67B5B 100%);
+        padding: 3rem;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 500px;
+        margin: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+        border: 2px solid rgba(230, 213, 195, 0.3);
+    }
+
+    .audio-permission-modal.show .audio-permission-content {
+        transform: scale(1);
+    }
+
+    .audio-permission-content h2 {
+        color: #E6D5C3;
+        font-family: 'Canela', serif;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .audio-permission-content p {
+        color: #E6D5C3;
+        font-family: 'Canela', serif;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .audio-permission-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .audio-permission-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 50px;
+        font-family: 'Canela', serif;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .audio-permission-btn.allow {
+        background: #E6D5C3;
+        color: #8B7355;
+    }
+
+    .audio-permission-btn.allow:hover {
+        background: #FFFFFF;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(230, 213, 195, 0.4);
+    }
+
+    .audio-permission-btn.deny {
+        background: rgba(230, 213, 195, 0.2);
+        color: #E6D5C3;
+        border: 2px solid rgba(230, 213, 195, 0.3);
+    }
+
+    .audio-permission-btn.deny:hover {
+        background: rgba(230, 213, 195, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .audio-icon {
+        font-size: 3rem;
+        color: #E6D5C3;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+        .audio-permission-content {
+            padding: 2rem;
+            margin: 1rem;
+        }
+        
+        .audio-permission-content h2 {
+            font-size: 1.5rem;
+        }
+        
+        .audio-permission-content p {
+            font-size: 1rem;
+        }
+        
+        .audio-permission-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="spa-content">
     <div class="artistas-container">
-            <a href="{% url 'visao' %}" class="artista">
-                <img src="{% static 'artistas/images/URIAS_INDEX.png' %}" alt="URIAS">
-            </a>
+        <a href="{% url 'artistas:visao' %}" class="artista">
+            <img src="{% static 'artistas/images/URIAS_INDEX.png' %}" alt="URIAS">
+        </a>
+    </div>
+</div>
+
+<!-- Modal de permissão de áudio -->
+<div id="audioPermissionModal" class="audio-permission-modal">
+    <div class="audio-permission-content">
+        <div class="audio-icon">🎵</div>
+        <h2>Permitir Áudio?</h2>
+        <p>Para uma experiência mais imersiva, permita a reprodução de áudio ao passar o mouse sobre os álbuns. Você pode alterar essa configuração a qualquer momento.</p>
+        <div class="audio-permission-buttons">
+            <button class="audio-permission-btn allow" onclick="allowAudio()">Permitir Áudio</button>
+            <button class="audio-permission-btn deny" onclick="denyAudio()">Não Permitir</button>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verifica se já existe uma permissão salva
-            const audioPermission = localStorage.getItem('audioPermission');
-            
-            // Se não existir permissão salva, pergunta ao usuário
-            if (audioPermission === null) {
-                alert('Para uma melhor experiência, permita a reprodução de áudio ao passar o mouse sobre os álbuns.');
-                localStorage.setItem('audioPermission', 'granted');
-            }
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Verifica se já existe uma permissão salva
+        const audioPermission = localStorage.getItem('audioPermission');
+        
+        // Se não existir permissão salva, mostra o modal
+        if (audioPermission === null) {
+            setTimeout(() => {
+                const modal = document.getElementById('audioPermissionModal');
+                modal.classList.add('show');
+            }, 1000); // Mostra após 1 segundo
+        }
+    });
+
+    function allowAudio() {
+        localStorage.setItem('audioPermission', 'granted');
+        hideModal();
+        
+        // Testa a reprodução de áudio para garantir que funciona
+        const testAudio = new Audio();
+        testAudio.src = "{% static 'artistas/audio/URIAS_AUDIO.mp3' %}";
+        testAudio.volume = 0;
+        testAudio.play().then(() => {
+            testAudio.pause();
+        }).catch(() => {
+            // Se falhar, ainda permite mas mostra aviso
+            console.log('Áudio permitido mas pode precisar de interação do usuário');
         });
-    </script>
-</body>
-</html> 
+    }
+
+    function denyAudio() {
+        localStorage.setItem('audioPermission', 'denied');
+        hideModal();
+    }
+
+    function hideModal() {
+        const modal = document.getElementById('audioPermissionModal');
+        modal.classList.remove('show');
+    }
+
+    // Função global para verificar permissão de áudio
+    window.checkAudioPermission = function() {
+        return localStorage.getItem('audioPermission') === 'granted';
+    };
+</script>
+{% endblock %} 
